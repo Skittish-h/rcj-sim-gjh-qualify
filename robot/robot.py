@@ -13,7 +13,7 @@ from GoToFunc import goTo
 from Goalie import goalie_angles, goalie_cal_Y, correct_rotation
 from SupportOptiPos import support_position
 from MovementCalculator import fit_parabola, get_tangent_point, passes_boundary
-
+from BackupGoMid import lackOfProgress
 ######
 
 INTERCEPT_CONST = 0.03
@@ -118,9 +118,16 @@ class MyRobot(RCJSoccerRobot):
         ball_angle, robot_angle = self.get_angles(ball_pos, robot_pos)
         return goTo(DesiredPos["x"], DesiredPos["y"], robot_pos, robot_angle) #0 right motor, 1 left motor 
 
-    def be_backup(self, robot_pos, data, Team):
+    def be_backup(self,ball_pos, robot_pos, data, Team):
         DesiredPos = support_position(data, Team)
+        
+        lackOfProgCheck = lackOfProgress
 
+        ball_positions=[]
+        ball_positions.insert(0,ball_pos)
+
+        if not (lackOfProgress.isLackOfProgress(self,ball_positions)):
+            DesiredPos = lackOfProgress.midPos
         ball_angle, robot_angle = self.get_angles(DesiredPos, robot_pos)
         return goTo(DesiredPos["x"], DesiredPos["y"], robot_pos, robot_angle) #0 right motor, 1 left motor 
     
@@ -160,7 +167,7 @@ class MyRobot(RCJSoccerRobot):
 
                 #if support is 1 B1 will execute backup code
                 elif role == "back":
-                    out = self.be_backup(robot_pos, data, Team)
+                    out = self.be_backup(ball_pos, robot_pos, data, Team)
                     pass
                 self.left_motor.setVelocity(out[1])
                 self.right_motor.setVelocity(out[0])
