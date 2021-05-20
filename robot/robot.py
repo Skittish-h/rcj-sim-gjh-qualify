@@ -118,15 +118,11 @@ class MyRobot(RCJSoccerRobot):
         ball_angle, robot_angle = self.get_angles(ball_pos, robot_pos)
         return goTo(DesiredPos["x"], DesiredPos["y"], robot_pos, robot_angle) #0 right motor, 1 left motor 
 
-    def be_backup(self,ball_pos, robot_pos, data, Team):
+    def be_backup(self, isLackOfProgress, robot_pos, data, Team):
         DesiredPos = support_position(data, Team)
         
-        lackOfProgCheck = lackOfProgress
 
-        ball_positions=[]
-        ball_positions.insert(0,ball_pos)
-
-        if not (lackOfProgress.isLackOfProgress(self,ball_positions)):
+        if not (isLackOfProgress):
             DesiredPos = lackOfProgress.midPos
         ball_angle, robot_angle = self.get_angles(DesiredPos, robot_pos)
         return goTo(DesiredPos["x"], DesiredPos["y"], robot_pos, robot_angle) #0 right motor, 1 left motor 
@@ -137,6 +133,9 @@ class MyRobot(RCJSoccerRobot):
         #create interceptcalc instance
         self.intercept_c = interceptCalculator(3)
 
+        lackOfProgCheck = lackOfProgress(0.4)
+        ball_positions=[]
+        
         Team = (self.team == "B")
         print(Team)
         while self.robot.step(TIME_STEP) != -1:
@@ -150,6 +149,8 @@ class MyRobot(RCJSoccerRobot):
                 ball_pos = coor_recalc(data['ball']['x'], data['ball']['y'], Team)
                 self.intercept_c.pushPoint(ball_pos)
                 
+                ball_positions.insert(0,ball_pos)
+
                 myi, intercepts = self.getIntercepts(data, Team)
                 
                 
@@ -157,7 +158,9 @@ class MyRobot(RCJSoccerRobot):
                 print(role)
                 print("Y coordinate to goal: ", scores_own_goal((1.0 if Team else 0.0), ball_pos, robot_pos, Team))
                 out=[]
-               
+
+                backup_goMid= lackOfProgress.isLackOfProgress(self,ball_pos)
+
                 # if roles att is 1 the B1 will execute attacker code
                 if role == "att":                
                     out = self.be_attacker(myi, robot_pos, Team)
@@ -168,7 +171,7 @@ class MyRobot(RCJSoccerRobot):
 
                 #if support is 1 B1 will execute backup code
                 elif role == "back":
-                    out = self.be_backup(ball_pos, robot_pos, data, Team)
+                    out = self.be_backup(backup_goMid, robot_pos, data, Team)
                     pass
                 self.left_motor.setVelocity(out[1])
                 self.right_motor.setVelocity(out[0])
