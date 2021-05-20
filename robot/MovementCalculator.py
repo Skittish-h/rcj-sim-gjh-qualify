@@ -56,6 +56,15 @@ def get_tangent_point(robot_pos: dict, parabola_constants: dict, team):
 
     return futurepoint
 
+#function that checks if robot isn't abotu to score an own goal.
+def scores_own_goal(goal_x, ball_pos, robot, team):
+    time_to_X = ((goal_x - ball_pos['x']) / (ball_pos['x'] - robot['x']))
+    y_coord = ball_pos['y'] + (time_to_X * (ball_pos['y'] - robot['y']))
+    ball_robot_dst = math.sqrt((robot['x']-ball_pos['x'])**2 + (robot['y']-ball_pos['y'])**2)
+    return ((0.2 < y_coord < 0.8) and ((ball_pos['x'] > robot['x']) if team else (ball_pos['x'] < robot['x']))  and ball_robot_dst < 0.1)
+    
+
+
 #function the takes a parabolic equation and using the discriminant calculates if it will intersect the boundaries of he field
 def passes_boundary(parabola_constants: dict):
     #if parabola opens upwards -> checking for intersections at y = 0

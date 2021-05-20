@@ -157,4 +157,15 @@ class interceptCalculator():
             prev_b_Y = bally
 
         return {"isIntercept":False, "x":0, "y":0, "t":1000,"kik":False}
-            
+    
+    #function that calculates target position in case of an own goal possible scenario.
+    def ball_doge_pos(self, ball_pos):
+        #spaghetti code:
+        #ball movement vector
+        ball_vector_x = self.estimateFunction('x')
+        ball_vector_y = self.estimateFunction('y')
+        
+        #strategy: find ball vector 
+        #   -> find the two perpendicular vectors, and then turn them into unit vectors
+        #   -> multiply by constant
+        #   -> 
