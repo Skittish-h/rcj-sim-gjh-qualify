@@ -9,7 +9,7 @@ git push"""
 def goTo(x, y, robot_pos, robot_angle, point_goal=True, point_angle=0, magicnum= 0.27):
     AngleNDistance = GetAngleToSpot(x,y,robot_pos, robot_angle) #0 angle to spot, 1 distance to spot
     
-    MotorsSpeed = RotateToSpot(AngleNDistance[0], magicnum) #0 right, 1 left 
+    MotorsSpeed = RotateToSpot(AngleNDistance[0], magicnum, AngleNDistance[1]) #0 right, 1 left 
     
     return [MotorsSpeed[0], MotorsSpeed[1]]
 
@@ -39,10 +39,9 @@ def GetAngleToSpot(x,y,robot_pos, robot_angle):
 
 #####################################################
 #####################################################
-def RotateToSpot (robotAngleFromSpot, magicnum):
+def RotateToSpot (robotAngleFromSpot, magicnum, dst):
     #defualt values
-    right = -10
-    left = -10                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     
     MagicNum = magicnum
     #67
     
@@ -52,14 +51,34 @@ def RotateToSpot (robotAngleFromSpot, magicnum):
         angleToTarget-=360
     #print(angleToTarget)
 
-    if(angleToTarget >=1 and angleToTarget <180):#turn left
-        left += (angleToTarget *MagicNum)
-        right  +=(-angleToTarget)*MagicNum
-    if(angleToTarget <= 359 and angleToTarget>=180):#turn right  
-        angleToTarget = 360 - angleToTarget
-        left += (-angleToTarget)*MagicNum 
-        right +=  (angleToTarget*MagicNum)*2
+    right = -10
+    left = -10   
+    if((angleToTarget > 0 and angleToTarget <90) or (angleToTarget > 270 and angleToTarget <360)):
+        if(angleToTarget >=0 and angleToTarget <180):#turn left
+            left += (angleToTarget *MagicNum)
+            right  +=(-angleToTarget)*MagicNum
+        if(angleToTarget <= 360 and angleToTarget>=180):#turn right  
+            angleToTarget = 360 - angleToTarget
+            left += (-angleToTarget)*MagicNum 
+            right +=  (angleToTarget*MagicNum)#*2
+    else:
+        right = 10
+        left = 10  
+        angleToTarget -= 180
+        if angleToTarget < 0:
+            angleToTarget+=360
+        if(angleToTarget >=0 and angleToTarget <180):#turn left
+            
+            left -= (-angleToTarget *MagicNum)
+            right  -=(angleToTarget)*MagicNum
+        if(angleToTarget <= 360 and angleToTarget>=180):#turn right  
+            angleToTarget = 360 - angleToTarget
+            left -= (angleToTarget)*MagicNum 
+            right -=  (-angleToTarget*MagicNum)#*2
 
+    # if dst < 0.1:
+    #     right = right*dst*20
+    #     left = left*dst*20
     #if motors speed exceed the limit. cap em
     if(right >10):
         right= 10

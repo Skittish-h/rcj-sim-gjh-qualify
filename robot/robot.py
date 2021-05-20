@@ -12,7 +12,7 @@ from CoordinateRecalculator import coor_recalc, robot_pos_recalc
 from GoToFunc import goTo
 from Goalie import goalie_angles, goalie_cal_Y, correct_rotation
 from SupportOptiPos import support_position
-from MovementCalculator import fit_parabola, get_tangent_point, passes_boundary
+from MovementCalculator import fit_parabola, get_tangent_point, passes_boundary, scores_own_goal
 from BackupGoMid import lackOfProgress
 ######
 
@@ -155,6 +155,7 @@ class MyRobot(RCJSoccerRobot):
                 
                 role = self.role_decision(intercepts, data)
                 print(role)
+                print("Y coordinate to goal: ", scores_own_goal((1.0 if Team else 0.0), ball_pos, robot_pos, Team))
                 out=[]
                
                 # if roles att is 1 the B1 will execute attacker code
