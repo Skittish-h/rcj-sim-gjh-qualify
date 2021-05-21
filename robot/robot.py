@@ -123,7 +123,7 @@ class MyRobot(RCJSoccerRobot):
         
 
         if not (isLackOfProgress):
-            DesiredPos = lackOfProgress.midPos
+            DesiredPos = lackOfProgress.midPos(Team)
         ball_angle, robot_angle = self.get_angles(DesiredPos, robot_pos)
         return goTo(DesiredPos["x"], DesiredPos["y"], robot_pos, robot_angle) #0 right motor, 1 left motor 
     
@@ -132,13 +132,13 @@ class MyRobot(RCJSoccerRobot):
     def run(self):
         #create interceptcalc instance
         self.intercept_c = interceptCalculator(3)
-
-        lackOfProgCheck = lackOfProgress(0.4)
-        ball_positions=[]
+        lackOfProgCheck = lackOfProgress(0.35)
+        
         
         Team = (self.team == "B")
-        print(Team)
         while self.robot.step(TIME_STEP) != -1:
+            print("this is team blue ", Team)
+
             if self.is_new_data():
                 data = self.get_new_data()
                 #due to extensive openAI gym testing we know that desync DOES occur
@@ -149,8 +149,6 @@ class MyRobot(RCJSoccerRobot):
                 ball_pos = coor_recalc(data['ball']['x'], data['ball']['y'], Team)
                 self.intercept_c.pushPoint(ball_pos)
                 
-                ball_positions.insert(0,ball_pos)
-
                 myi, intercepts = self.getIntercepts(data, Team)
                 
                 
@@ -159,7 +157,7 @@ class MyRobot(RCJSoccerRobot):
                 print("Y coordinate to goal: ", scores_own_goal((1.0 if Team else 0.0), ball_pos, robot_pos, Team))
                 out=[]
 
-                backup_goMid= lackOfProgress.isLackOfProgress(self,ball_pos)
+                backup_goMid= lackOfProgCheck.isLackOfProgress(ball_pos)
 
                 # if roles att is 1 the B1 will execute attacker code
                 if role == "att":                
